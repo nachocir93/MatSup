@@ -21,7 +21,7 @@ txtCeros = uicontrol (p, "style", "edit", "string", "Ceros", "position",[170 80 
 
 % create a button (default style)
 btnTodasLasCaracteristicas = uicontrol (f, "style", "pushbutton", "string", "Obtener todas las caracteristicas", "position",[55 0 200 40],'callback',{@mycallback,"1"});
-btnObtenerFuncionTransferencia = uicontrol (f, "style", "pushbutton", "string", "Obtener funcion G(S)", "position",[55 -40 200 40], 'callback', {@obtenerFTranf, txtPolos, txtCeros});
+btnObtenerFuncionTransferencia = uicontrol (f, "style", "pushbutton", "string", "Obtener funcion G(S)", "position",[55 -40 200 40], 'callback', {@obtenerFTranf, txtPolos, txtCeros, txtEntrada, txtSalida, txtValorK});
 btnIndicarPolos = uicontrol (f, "style", "pushbutton", "string", "Polos", "position",[55 -120 200 40]);
 btnIndicarCeros = uicontrol (f, "style", "pushbutton", "string", "Ceros", "position",[55 -80 200 40]);
 btnGanancia = uicontrol (f, "style", "pushbutton", "string", "Ganancia", "position",[55 -160 200 40]);
@@ -29,33 +29,12 @@ bntEstabilidad = uicontrol (f, "style", "pushbutton", "string", "Estabilidad", "
 btnBorrarTodo = uicontrol (f, "style", "pushbutton", "string", "Borrar todo", "position",[410 0 200 40],'callback',{@mycallback2,txtPolos,txtCeros});
 btnFinalizar = uicontrol (f, "style", "pushbutton", "string", "Finalizar", "position",[410 -40 200 40]);
 
-function obtenerFTranf (hsrc, evt,polos,ceros)
-  textoC = strsplit(get(ceros,'string'));
-  finC = numel(textoC);
-  numerador = armarPoli(textoC,finC);
-  disp("Numerador:");
-  polyout(numerador);
-  
-  textoP = strsplit(get(polos,'string'));
-  finP = numel(textoP);
-  denominador = armarPoli(textoP,finP);
-  disp("Denominador:");
-  polyout(denominador);
-endfunction
-
-function poli = armarPoli (polos_ceros, fin)
-  i = 1;
-  while(i <= fin)
-    polo_cero = str2double(polos_ceros{i});
-    pPolo_Cero = [1 -polo_cero];
-    if (i == 1)
-      poli = pPolo_Cero;
-    else
-      poli = conv(poli,pPolo_Cero);
-    endif
-    i++;
-  endwhile
-  return
+function obtenerFTranf (hsrc, evt,polos,ceros,entrada,salida,k)
+  vecC = str2num(get(ceros,'string'));
+  vecP = str2num(get(polos,'string'));
+  g = zpk(vecC,vecP,1);
+  set(salida,'string',(polyout(cell2mat(g.num))));
+  set(k,'string',"1");
 endfunction
 
 function mycallback2 (hsrc, evt,polos,ceros)
