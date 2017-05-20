@@ -34,6 +34,7 @@ function obtenerFTranf (hsrc, evt,polos,ceros,entrada,salida,k)
   vecP = str2num(get(polos,'string'));
   g = zpk(vecC,vecP,1);
   set(salida,'string',(polyout(cell2mat(g.num))));
+  set(entrada,'string',(polyout(cell2mat(g.den))));
   set(k,'string',"1");
 endfunction
 
