@@ -13,7 +13,7 @@ e1 = uicontrol (p, "style", "text", "string", "Polos =","position",[80 40 80 40]
 % Creo los textbox para ingresar Numerador, Denominador y K
 txtSalida = uicontrol (p, "style", "edit", "string", "S(S)","position",[220 185 200 40]);
 txtEntrada = uicontrol (p, "style", "edit", "string", "E(S)", "position",[220 145 200 40]);
-txtValorK = uicontrol (p, "style", "edit", "string", "K", "position",[170 165 50 40]);
+txtValorK = uicontrol (p, "style", "text", "string", "K", "position",[170 165 50 40]);
 
 %Creo los textbox para ingresar Polos y Ceros
 txtPolos = uicontrol (p, "style", "edit", "string", "Polos","position",[170 40 200 40]);
@@ -22,12 +22,45 @@ txtCeros = uicontrol (p, "style", "edit", "string", "Ceros", "position",[170 80 
 % create a button (default style)
 btnTodasLasCaracteristicas = uicontrol (f, "style", "pushbutton", "string", "Obtener todas las caracteristicas", "position",[55 0 200 40],'callback',{@mycallback,"1"});
 btnObtenerFuncionTransferencia = uicontrol (f, "style", "pushbutton", "string", "Obtener funcion G(S)", "position",[55 -40 200 40], 'callback', {@obtenerFTranf, txtPolos, txtCeros, txtEntrada, txtSalida, txtValorK});
-btnIndicarPolos = uicontrol (f, "style", "pushbutton", "string", "Polos", "position",[55 -120 200 40]);
-btnIndicarCeros = uicontrol (f, "style", "pushbutton", "string", "Ceros", "position",[55 -80 200 40]);
+btnIndicarPolos = uicontrol (f, "style", "pushbutton", "string", "Polos", "position",[55 -120 200 40],'callback',{@funcionPolosCeros,txtEntrada,txtPolos});
+btnIndicarCeros = uicontrol (f, "style", "pushbutton", "string", "Ceros", "position",[55 -80 200 40],'callback',{@funcionPolosCeros,txtSalida,txtCeros});
 btnGanancia = uicontrol (f, "style", "pushbutton", "string", "Ganancia", "position",[55 -160 200 40]);
 bntEstabilidad = uicontrol (f, "style", "pushbutton", "string", "Estabilidad", "position",[55 -200 200 40]);
 btnBorrarTodo = uicontrol (f, "style", "pushbutton", "string", "Borrar todo", "position",[410 0 200 40],'callback',{@mycallback2,txtPolos,txtCeros});
 btnFinalizar = uicontrol (f, "style", "pushbutton", "string", "Finalizar", "position",[410 -40 200 40]);
+
+function funcionPolosCeros (hsrc, evt,S_E,P_C)
+  polinomio = leerPoly(S_E);
+  raices = roots(polinomio);
+  set(P_C, 'string',num2str(raices));
+endfunction
+
+function coefs = leerPoly (entrada)
+  textoPoly = strsplit(get(entrada,'string'));
+  elementos = numel(textoPoly);
+  i = 1;
+  coefs = [];
+  negativo = false;
+  
+  while (i <= elementos)
+    coef = strtok(textoPoly{i}, "*");
+    
+    if (strcmp(coef,"-"))
+      negativo = true;
+    elseif(strcmp(coef,"+"))
+      negativo = false;
+    else
+      if (negativo)
+        coefs(end+1) = -str2num(coef);
+      else
+        coefs(end+1) = str2num(coef);
+      endif
+    endif
+    
+    i++;
+  endwhile
+  return
+endfunction
 
 function obtenerFTranf (hsrc, evt,polos,ceros,entrada,salida,k)
   vecC = str2num(get(ceros,'string'));
